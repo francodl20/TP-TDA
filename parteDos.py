@@ -85,26 +85,55 @@ def printResults(sofia, mateo):
     else:
         print("Empate ????")
 
-def sofiaPD(coins, notes):
+def sofiaRecursive(coins, notes):
+
     first = coins[0]
     last = coins[-1]
+
+    if len(coins) == 2:
+        return max(first, last)
+    elif len(coins) == 3:
+
+        if max(first, last) == first:
+            notes.append(first)
+            minimum = min(coins[1], last)
+            notes.append(minimum)
+            return first + minimum
+        else:
+            notes.append(last)
+            minimum = min(first, coins[1])
+            notes.append(minimum)
+            return last + minimum
 
     second = coins[1]
     secondLast = coins[-2]
 
-    mateoPrediction1 = max(second, last)
-    mateoPrediction2 = max(first, secondLast)
+    notes1 = notes[:] #Se puede usar .copy() habra que ver
+    notes2 = notes[:]
 
+    if second >= last:
+        firstPath = sofiaRecursive(coins[2:], notes1)
+    else:
+        firstPath = sofiaRecursive(coins[1:-1], notes1)
 
-    firstPath = max(first + sofiaPD(coins[1:]), 
-                    first + sofiaSelection())
+    if first >= secondLast:
+        lastPath = sofiaRecursive(coins[1:-1], notes2)
+    else:
+        lastPath = sofiaRecursive(coins[:-2], notes2)
+
+    if firstPath >= lastPath:
+        notes = notes1[:]
+        notes.append(first)
+        maxSum = firstPath + first
+    else:
+        notes = notes2[:]
+        notes.append(last)
+        maxSum = lastPath + last
 
     return maxSum
 
-def sofiaSelection(coins):
-      
-
-    return
+def sofiaSelection(notes):
+    return notes.pop(0)
 
 def mateoSelection(coins):
     first = coins[0]
@@ -118,10 +147,13 @@ def sofiaPD(coins):
     turn = 1
     sofia = []
     mateo = []
+    notes = []
+
+    sofiaRecursive(coins, notes)
 
     while coins:
         if turn > 0:
-            best = sofiaSelection(coins)
+            best = sofiaSelection(notes[::-1])
 
             sofia.append(best)
             coins.remove(best)
@@ -133,3 +165,14 @@ def sofiaPD(coins):
         turn *= -1
 
     printResults(sofia, mateo)
+
+num = 1
+
+while num != 0:
+    num = input("Numero de ejemplo: ")
+    file = num + ".txt"
+
+    coins = readTxt(file)
+    sofiaPD(coins)
+
+    print("\n")
