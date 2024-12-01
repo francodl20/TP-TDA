@@ -91,7 +91,9 @@ def sofiaRecursive(coins, notes):
     last = coins[-1]
 
     if len(coins) == 2:
-        return max(first, last)
+        best = max(first, last)
+        notes.append(best)
+        return best
     elif len(coins) == 3:
 
         if max(first, last) == first:
@@ -108,27 +110,33 @@ def sofiaRecursive(coins, notes):
     second = coins[1]
     secondLast = coins[-2]
 
-    notes1 = notes[:] #Se puede usar .copy() habra que ver
-    notes2 = notes[:]
+    notes1 = []
+    notes2 = []
 
+    #If choosing first
     if second >= last:
         firstPath = sofiaRecursive(coins[2:], notes1)
+        firstPath += first
     else:
         firstPath = sofiaRecursive(coins[1:-1], notes1)
+        firstPath += first
 
+    #If choosing second
     if first >= secondLast:
         lastPath = sofiaRecursive(coins[1:-1], notes2)
+        lastPath += last
     else:
         lastPath = sofiaRecursive(coins[:-2], notes2)
+        lastPath += last
 
     if firstPath >= lastPath:
-        notes = notes1[:]
+        notes = notes1.copy() #Se puede usar [:] habra que ver
         notes.append(first)
-        maxSum = firstPath + first
+        maxSum = firstPath
     else:
-        notes = notes2[:]
+        notes = notes2.copy()
         notes.append(last)
-        maxSum = lastPath + last
+        maxSum = lastPath
 
     return maxSum
 
@@ -149,7 +157,7 @@ def sofiaPD(coins):
     mateo = []
     notes = []
 
-    sofiaRecursive(coins, notes)
+    sofiaRecursive(coins)
 
     while coins:
         if turn > 0:
