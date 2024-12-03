@@ -85,60 +85,58 @@ def printResults(sofia, mateo):
     else:
         print("Empate ????")
 
-def sofiaRecursive(coins, notes):
+def sofiaRecursive(coins):
 
     first = coins[0]
     last = coins[-1]
 
+    notes = []
+
     if len(coins) == 2:
         best = max(first, last)
         notes.append(best)
-        return best
+        return notes, best
     elif len(coins) == 3:
-
-        if max(first, last) == first:
-            notes.append(first)
+        if first >= last:
             minimum = min(coins[1], last)
             notes.append(minimum)
-            return first + minimum
+            notes.append(first)
+            return notes, (first + minimum)
         else:
-            notes.append(last)
             minimum = min(first, coins[1])
             notes.append(minimum)
-            return last + minimum
+            notes.append(last)
+            return notes, (last + minimum)
 
     second = coins[1]
     secondLast = coins[-2]
 
-    notes1 = []
-    notes2 = []
-
     #If choosing first
     if second >= last:
-        firstPath = sofiaRecursive(coins[2:], notes1)
+        notes1, firstPath = sofiaRecursive(coins[2:])
         firstPath += first
     else:
-        firstPath = sofiaRecursive(coins[1:-1], notes1)
+        notes1, firstPath = sofiaRecursive(coins[1:-1])
         firstPath += first
 
     #If choosing second
     if first >= secondLast:
-        lastPath = sofiaRecursive(coins[1:-1], notes2)
+        notes2, lastPath = sofiaRecursive(coins[1:-1])
         lastPath += last
     else:
-        lastPath = sofiaRecursive(coins[:-2], notes2)
+        notes2, lastPath = sofiaRecursive(coins[:-2])
         lastPath += last
 
     if firstPath >= lastPath:
-        notes = notes1.copy() #Se puede usar [:] habra que ver
+        notes = notes1
         notes.append(first)
         maxSum = firstPath
     else:
-        notes = notes2.copy()
+        notes = notes2
         notes.append(last)
         maxSum = lastPath
 
-    return maxSum
+    return notes, maxSum
 
 def sofiaSelection(notes):
     return notes.pop(0)
@@ -157,11 +155,13 @@ def sofiaPD(coins):
     mateo = []
     notes = []
 
-    sofiaRecursive(coins)
+    notes, result = sofiaRecursive(coins)
+
+    notes.reverse()
 
     while coins:
         if turn > 0:
-            best = sofiaSelection(notes[::-1])
+            best = sofiaSelection(notes)
 
             sofia.append(best)
             coins.remove(best)
