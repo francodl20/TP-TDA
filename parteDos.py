@@ -39,6 +39,8 @@ Consigna
 #   Sofia usa "nueva tecnica" y mateo elige el mayor valor disponible
 #   Algoritmo de programacion dinamica
 
+import time
+
 def readTxt(txt):
     
     #Input coins txt
@@ -180,7 +182,11 @@ while num != 0:
     num = input("Numero de ejemplo: ")
     file = num + ".txt"
 
+    start = time.time()
     coins = readTxt(file)
     sofiaPD(coins)
+    end = time.time()
+    
+    print("Tiempo: ", end - start)
 
     print("\n")
