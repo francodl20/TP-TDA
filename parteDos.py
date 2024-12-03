@@ -87,46 +87,66 @@ def printResults(sofia, mateo):
     else:
         print("Empate ????")
 
-def sofiaRecursive(coins):
+def sofiaRecursive(coins, firstI, lastI, memo):
 
-    first = coins[0]
-    last = coins[-1]
+    first = coins[firstI]
+    last = coins[lastI]
 
     notes = []
 
-    if len(coins) == 2:
+    if (firstI - lastI) >= 0:
+        return notes, 0
+
+    if memo[0][firstI][lastI] != -1:
+        return memo[1][firstI][lastI], memo[0][firstI][lastI]
+
+    if (firstI - lastI) == -1:
         best = max(first, last)
         notes.append(best)
+
+        memo[0][firstI][lastI] = best
+        memo[1][firstI][lastI] = notes
+
         return notes, best
-    elif len(coins) == 3:
+    elif (firstI - lastI) == -2:
         if first >= last:
-            minimum = min(coins[1], last)
+            minimum = min(coins[firstI + 1], last)
             notes.append(minimum)
             notes.append(first)
-            return notes, (first + minimum)
+
+            maxSum = first + minimum
+            memo[0][firstI][lastI] = maxSum
+            memo[1][firstI][lastI] = notes
+
+            return notes, maxSum
         else:
-            minimum = min(first, coins[1])
+            minimum = min(first, coins[firstI + 1])
             notes.append(minimum)
             notes.append(last)
-            return notes, (last + minimum)
 
-    second = coins[1]
-    secondLast = coins[-2]
+            maxSum = last + minimum
+            memo[0][firstI][lastI] = maxSum
+            memo[1][firstI][lastI] = notes
+
+            return notes, maxSum
+
+    second = coins[firstI + 1]
+    secondLast = coins[lastI - 1]
 
     #If choosing first
     if second >= last:
-        notes1, firstPath = sofiaRecursive(coins[2:])
+        notes1, firstPath = sofiaRecursive(coins, firstI + 2, lastI, memo)
         firstPath += first
     else:
-        notes1, firstPath = sofiaRecursive(coins[1:-1])
+        notes1, firstPath = sofiaRecursive(coins, firstI + 1, lastI - 1, memo)
         firstPath += first
 
     #If choosing second
     if first >= secondLast:
-        notes2, lastPath = sofiaRecursive(coins[1:-1])
+        notes2, lastPath = sofiaRecursive(coins, firstI + 1, lastI - 1, memo)
         lastPath += last
     else:
-        notes2, lastPath = sofiaRecursive(coins[:-2])
+        notes2, lastPath = sofiaRecursive(coins, firstI, lastI - 2, memo)
         lastPath += last
 
     if firstPath >= lastPath:
@@ -137,6 +157,9 @@ def sofiaRecursive(coins):
         notes = notes2
         notes.append(last)
         maxSum = lastPath
+
+    memo[0][firstI][lastI] = maxSum
+    memo[1][firstI][lastI] = notes
 
     return notes, maxSum
 
@@ -156,8 +179,9 @@ def sofiaPD(coins):
     sofia = []
     mateo = []
     notes = []
+    memo = [[[-1 if a==0 else [] for _ in range(len(coins))] for _ in range(len(coins))] for a in range(2)]
 
-    notes, result = sofiaRecursive(coins)
+    notes, result = sofiaRecursive(coins, 0, len(coins) - 1, memo)
 
     notes.reverse()
 
